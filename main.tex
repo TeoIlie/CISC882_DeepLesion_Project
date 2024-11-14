@@ -20,7 +20,7 @@
 \colorlet{shadecolor}{yellow}
 % \usepackage{color,soul}
 \usepackage[pdftex]{graphicx}
-\graphicspath{{../pdf/}{../jpeg/}}
+\graphicspath{{../images/}}
 \DeclareGraphicsExtensions{.pdf,.jpeg,.png}
 
 \usepackage[cmex10]{amsmath}
@@ -41,7 +41,7 @@
 \begin{document}
 \bstctlcite{IEEEexample:BSTcontrol}
     \title{Screening  Radiology  Images  for Lesion  Detection: An ML Approach}
-  \author{Teodor~Ilie,~Jihye    on~Park,~and~Alex~Sun% <-this % stops a space
+  \author{Teodor~Ilie,~Jihyeon~Park,~and~Alex~Sun% <-this % stops a space
 
 }  
 
@@ -56,8 +56,13 @@
 % =================================================================================
 \begin{abstract}
 %\boldmath
-This is the abstract.
-\end{abstract}
+Radiologists manually evaluate large volumes of CT scans daily, and with this large workload comes the possibility of human error. Recent years have seen a rise in ``reckless-reading lawsuits", accusing radiologists of spending insufficient time viewing images, and leading to missed findings. At the same time, it is not unusual for experts to view images for only a second, and there is no clear research indicating that enforcing longer viewing times would improve accuracy; rather the issue is often with human error brought on by fatigue. \cite{workload}
+
+To improve the interpretation process, we propose employing AI models to give radiologists an additional tool to assist with their analysis, particularly for identifying lesions. Using the massive DeepLesion \cite{deeplesion} dataset, we train and test a range of state-of-the-art models to generate bounding boxes for lesions, given CT scans as input, and determine which produces the most accurate results. 
+
+\textit{Discuss results here when available.} 
+
+The output of our model can be deployed for use in hospitals, and be further inspected by radiologists to determine malignancy and subsequent treatment. We argue that such a tool improves the performance of human analysis alone, mitigating human error caused by fatigue, long hours, and other challenging circumstances radiologists face. \end{abstract}
 
 \begin{IEEEkeywords}
 Radiology, DeepLesion, Convolutional Neural Network, U-Net, YOLO
@@ -67,7 +72,7 @@ Radiology, DeepLesion, Convolutional Neural Network, U-Net, YOLO
 % === II. BACKGROUND =============================================================
 % =================================================================================
 \section{Background}
-
+\subsection{CT Scans and Radiologist Workload}
 % =======
 % FIG. 01
 % =======
@@ -78,13 +83,32 @@ Radiology, DeepLesion, Convolutional Neural Network, U-Net, YOLO
 %  \end{center}
 %\end{figure}
 
-\IEEEPARstart{C}{omputed} Tomography (CT) scans produce dozens, even hundreds of images of cross-sectional slices of patients, which may contain tumorous lesions indicative of cancer. However, when a radiologist is searching through these images, they are not always looking for tumorous lesions. This is also an incredibly time-consuming process, and the lesions could often be missed by the radiologist. We propose an ML model which automatically analyzes individual CT scan slices, efficiently and accurately detecting and highlighting lesions in the images for closer inspection by a radiologist.  This would serve as an immensely useful tool to assist radiologists with making early cancer diagnoses, potentially saving lives.
+\IEEEPARstart{C}{omputed} Tomography (CT) scanners take many cross-sectional areas at fixed-length intervals along a specific body part, generating dozens or even hundreds of scans depending on the area of interest \cite{PMID:33620865}. There are many use cases for CT scans including preventative medicine and cancer screening, but scanning for lesions is particularly useful. A lesion is visible on a CT scan as it looks abnormal from the surrounding tissue, and radiologists manually inspect scans to determine parameters like the size and shape of the lesion. Lesions fall into several categories, including benign lesions such as cysts and fibromas, cancerous lesions such as tumours and metastases, and infectious lesions such as abscesses and granulomas. Lesion types cannot always be classified from CT scans alone, and subsequent tests such as biopsies, additional imaging tests such as MRI and ultrasound, blood tests, and others are used to determine the lesions cause and treatment courses \cite{oncology}.
+
+% =======
+% FIG. 01
+% =======
+\begin{figure}
+ \begin{center}
+ \includegraphics[width=3.5in]{images/scan_error.jpeg}\\
+ \caption{Categories of interpretive error, both internal and external \cite{radiology_error}}\label{interpret_error}
+ \end{center}
+\end{figure}
+
+As the use of medical imaging such as CT scans continues to grow due to its numerous applications, radiologists are in increasing demand, yet expert radiologists are a scarce resource due to the time and challenges of training. This is placing increasing strain on the time and resources of existing radiologists, leading to climbing medical errors brought on by fatigue, and it is a leading cause of litigation. Medical error is a serious issue; Makary et al. have argued that should medical error, in general, be treated as a disease, it would rank as the third top cause of death in the US \cite{medical_error}. 
+
+An overview of the most common ways radiologists are affected by interpretive error is given in Figure \ref{interpret_error}. Funaki et al. have determined that as much as 60-80\% of errors, depending on the context, are caused by perception error \cite{perception_error}. In addition, there has been a sevenfold increase in image interpretations performed per minute from 1999 to 2000, which is likely causing human errors to increase due to fatigue from the increased workload \cite{radiology_error}. 
+
+At the same time, it is challenging to determine and implement meaningful workload limitations for radiologists, given the complexity of the process and the variation from person to person. While it is well-established that reducing the viewing time negatively affects interpretation accuracy, prescribing blanket variations for all radiologists would also be arbitrary and ineffective, as such regulations would not account for the varying degrees to which different people are affected by the same circumstances. As such, radiologists continue to self-regulate the workload to a great extent. Furthermore, external factors such as distraction and cognitive biases are even more challenging to address with regulation or training \cite{workload}. 
+
+\subsection{Improvements through AI}
+Many of these human errors have the potential to be dramatically improved through the use of computer-aided diagnosis, and in particular, modern AI image recognition models. As these models continue to improve, they have already seen successful applications in providing radiologists with a second opinion in real-time, acting as a ``safety net". Of particular interest is the fact that they are entirely unaffected by human errors of bias and fatigue, and as algorithms continue to improve, their perceptual abilities begin to compete with that of even trained radiologists \cite{workload}. Some experts even go so far as to claim that radiologists will gradually be altogether replaced by better-performing, cheaper, and faster AI systems \cite{ai_foe}, while others maintain that radiologists will continue to play the central role, and AI tools will remain just that - an additional tool to enhance their work quality \cite{doctors_ftw}. Either way, the consensus is clearly in favour of the benefits of increasing the quality and roll-out of AI models for improved diagnostic accuracy and quality, and its potential to save lives \cite{consensus}\cite{ai_adoption}. 
 
 
 % === III. HYPOTHESIS ========================
 % =================================================================================
 \section{Hypothesis}
-Hypothesis\cite{deeplesion}
+Hypothesis
 
 % === IV. METHODS ========================
 % =================================================================================
