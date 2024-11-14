@@ -60,7 +60,7 @@ Radiologists manually evaluate large volumes of CT scans daily, and with this la
 
 To improve the interpretation process, we propose employing AI models to give radiologists an additional tool to assist with their analysis, particularly for identifying lesions. Using the massive DeepLesion \cite{deeplesion} dataset, we train and test a range of state-of-the-art models to generate bounding boxes for lesions, given CT scans as input, and determine which produces the most accurate results. 
 
-\textit{Discuss results here when available.} 
+\hl{Discuss results here when available.}
 
 The output of our model can be deployed for use in hospitals, and be further inspected by radiologists to determine malignancy and subsequent treatment. We argue that such a tool improves the performance of human analysis alone, mitigating human error caused by fatigue, long hours, and other challenging circumstances radiologists face. \end{abstract}
 
@@ -91,7 +91,7 @@ Radiology, DeepLesion, Convolutional Neural Network, U-Net, YOLO
 \begin{figure}
  \begin{center}
  \includegraphics[width=3.5in]{images/scan_error.jpeg}\\
- \caption{Categories of interpretive error, both internal and external \cite{radiology_error}}\label{interpret_error}
+ \caption{Categories of interpretive error, both internal and external \cite{radiology_error}.}\label{interpret_error}
  \end{center}
 \end{figure}
 
@@ -102,28 +102,42 @@ An overview of the most common ways radiologists are affected by interpretive er
 At the same time, it is challenging to determine and implement meaningful workload limitations for radiologists, given the complexity of the process and the variation from person to person. While it is well-established that reducing the viewing time negatively affects interpretation accuracy, prescribing blanket variations for all radiologists would also be arbitrary and ineffective, as such regulations would not account for the varying degrees to which different people are affected by the same circumstances. As such, radiologists continue to self-regulate the workload to a great extent. Furthermore, external factors such as distraction and cognitive biases are even more challenging to address with regulation or training \cite{workload}. 
 
 \subsection{Improvements through AI}
-Many of these human errors have the potential to be dramatically improved through the use of computer-aided diagnosis, and in particular, modern AI image recognition models. As these models continue to improve, they have already seen successful applications in providing radiologists with a second opinion in real-time, acting as a ``safety net". Of particular interest is the fact that they are entirely unaffected by human errors of bias and fatigue, and as algorithms continue to improve, their perceptual abilities begin to compete with that of even trained radiologists \cite{workload}. Some experts even go so far as to claim that radiologists will gradually be altogether replaced by better-performing, cheaper, and faster AI systems \cite{ai_foe}, while others maintain that radiologists will continue to play the central role, and AI tools will remain just that - an additional tool to enhance their work quality \cite{doctors_ftw}. Either way, the consensus is clearly in favour of the benefits of increasing the quality and roll-out of AI models for improved diagnostic accuracy and quality, and its potential to save lives \cite{consensus}\cite{ai_adoption}. 
+Many of these human errors have the potential to be dramatically improved through the use of computer-aided diagnosis, and in particular, modern AI image recognition models. With lesion detection being one of the most important yet time-consuming tasks of radiologists, such a tool would be immensely useful \cite{deep_learning_survey}. As these models continue to improve, they have already seen successful applications in providing radiologists with a second opinion in real-time, acting as a ``safety net". Of particular interest is the fact that they are entirely unaffected by human errors of bias and fatigue, and as algorithms continue to improve, their perceptual abilities begin to compete with that of even trained radiologists \cite{workload}. Some experts even go so far as to claim that radiologists will gradually be altogether replaced by better-performing, cheaper, and faster AI systems \cite{ai_foe}, while others maintain that radiologists will continue to play the central role, and AI tools will remain just that - an additional tool to enhance their work quality \cite{doctors_ftw}. Either way, the consensus is clearly in favour of the benefits of increasing the quality and roll-out of AI models for improved diagnostic accuracy and quality, and its potential to save lives \cite{consensus}\cite{ai_adoption}. 
+
+\hl{Explain basic function and performance of CNNs, Faster R-CNN, U-NET, and other models we decide to use.}
 
 
 % === III. HYPOTHESIS ========================
 % =================================================================================
 \section{Hypothesis}
-Hypothesis
+Our primary aim is to explore the accuracy with which an AI model can generate bounding boxes for lesions on CT scan images, as compared to the ground truth. We hypothesize that state-of-the-art image recognition algorithms are able to perform on-par, or even exceed, expert analysis.
 
 % === IV. METHODS ========================
 % =================================================================================
 \section{Methods}
+We train our model on the DeepLesion dataset, which contains 32,735 lesions in 32,120 CT slices from 10,594 studies of 4,427 unique patients \cite{deeplesion}. This dataset is publicly available and does not require special access permissions. The data is gathered from CT scan images that were annotated by radiologists during routine analysis, and stored as ``bookmarks" in hospitals' picture archiving and communication systems (PACS).  
+
+Every image is annotated with a bounding box surrounding lesions, and each lesion contains information about the lesion diameter and lesion type.
+We will compare various models such as CNN (Convolutional Neural Networks), U-Net (a type of CNN architecture well-suited for semantic segmentation), and Faster R-CNN (a faster version of R-CNN that searches for objects using region proposals) \hl{This may be addressed in background, and should be adjusted based on the models we end up choosing}. We will determine the speed and accuracy trade-offs of these models, using the Dice-Sørensen coefficient to compare our model’s performance relative to the original bounding boxes.
+
+To ensure that the data is not skewed, we will ensure the data is split by patient into training, validation and testing. By splitting the data, we can check the performance of our model on new data that was not used for training \cite{chollet_deep_learning}. We will also attempt to address the possibility of skewed data due to all images in the dataset containing a lesion, and some lesions not being annotated \cite{deeplesion}. The proposed fix is to remove lesions for part of the data somehow, either by slicing out part of the image entirely or by using content-aware filling, such that our model will not be biased towards always predicting lesions on scans.
+
+\hl{Discuss data pre-processing here, once we have results.}
 
 % === V. RESULTS ========================
 % =================================================================================
 \section{Results}
+\hl{TBD}
 
 % === VI. DISCUSSION ========================
 % =================================================================================
 \section{Discussion}
+\hl{Based on results, discuss how close we came to the ground truth in the original DeepLesion annotations. Discuss that there is bias due to the lack of images with no lesions. Discuss that there are some lesions not annotated as the radiologists were not interested in fully annotating the images, as they were not explicitly meant for training a DL model.
 
+Discuss possible use cases, how similar models have been deployed in practice up to now, and how such models have performed.}
 
 \section*{Team Reflection}
+All three of the authors have a background in computer science, and not biology. As such, our focus was on processing the data and implementing AI models with high accuracy, and not on the underlying biological significance of lesions.
 
 \bibliographystyle{IEEEtran}
 \bibliography{IEEEabrv,Bibliography}
