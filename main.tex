@@ -1,4 +1,4 @@
-%
+    %
 % Credit to Tibault Reveyrand for the initial template - https://www.overleaf.com/articles/ieee-journal-submission-trans-on-mtt-example/pbfcbcjvmvmn
 
 % ================================================
@@ -58,11 +58,9 @@
 %\boldmath
 Radiologists manually evaluate large volumes of CT scans daily, and with this large workload comes the possibility of human error. Recent years have seen a rise in ``reckless-reading lawsuits", accusing radiologists of spending insufficient time viewing images, and leading to missed findings. At the same time, it is not unusual for experts to view images for only a second, and there is no clear research indicating that enforcing longer viewing times would improve accuracy; rather the issue is often with human error brought on by fatigue. \cite{workload}
 
-To improve the interpretation process, we propose employing AI models to give radiologists an additional tool to assist with their analysis, particularly for identifying lesions. Using the massive DeepLesion \cite{deeplesion} dataset, we train and test a range of state-of-the-art models to generate bounding boxes for lesions, given CT scans as input, and determine which produces the most accurate results. 
+Our primary aim is to improve the interpretation process by employing a state-of-the-art YOLOv3 image recognition model to give radiologists an additional tool to assist with their analysis, particularly for identifying lesions, which will improve patient diagnostic accuracy. Using the massive DeepLesion \cite{deeplesion} dataset, we train the model and determine its performance. Unfortunately, given the time constraint, we were unable to produce a model with sufficient accuracy for real-world use; additional work is required.
 
-\hl{Discuss results here when finalized, comparing various model performance.}
-
-The output of our model can be deployed for use in hospitals, and be further inspected by radiologists to determine malignancy and subsequent treatment. We argue that such a tool improves the performance of human analysis alone, mitigating human error caused by fatigue, long hours, and other challenging circumstances radiologists face. \end{abstract}
+The output of the model can be deployed for use in hospitals, and be further inspected by radiologists to determine malignancy and subsequent treatment. We argue that such a tool improves the performance of human analysis alone, mitigating human error caused by fatigue, long hours, and other challenging circumstances radiologists face. \end{abstract}
 
 \begin{IEEEkeywords}
 Radiology, DeepLesion, Convolutional Neural Network, U-Net, YOLO
@@ -90,7 +88,7 @@ Radiology, DeepLesion, Convolutional Neural Network, U-Net, YOLO
 % =======
 \begin{figure}
  \begin{center}
- \includegraphics[width=3.5in]{images/scan_error.jpeg}\\
+ \includegraphics[width=2.5in]{images/scan_error.jpeg}\\
  \caption{Categories of interpretive error, both internal and external \cite{radiology_error}.}\label{interpret_error}
  \end{center}
 \end{figure}
@@ -102,72 +100,121 @@ An overview of the most common ways radiologists are affected by interpretive er
 At the same time, it is challenging to determine and implement meaningful workload limitations for radiologists, given the complexity of the process and the variation from person to person. While it is well-established that reducing the viewing time negatively affects interpretation accuracy, prescribing blanket variations for all radiologists would also be arbitrary and ineffective, as such regulations would not account for the varying degrees to which different people are affected by the same circumstances. As such, radiologists continue to self-regulate the workload to a great extent. Furthermore, external factors such as distraction and cognitive biases are even more challenging to address with regulation or training \cite{workload}. 
 
 \subsection{Improvements through AI}
-Many of these human errors have the potential to be dramatically improved through the use of computer-aided diagnosis, and in particular, modern AI image recognition models. With lesion detection being one of the most important yet time-consuming tasks of radiologists, such a tool would be immensely useful \cite{deep_learning_survey}. As these models continue to improve, they have already seen successful applications in providing radiologists with a second opinion in real-time, acting as a ``safety net". Of particular interest is the fact that they are entirely unaffected by human errors of bias and fatigue, and as algorithms continue to improve, their perceptual abilities begin to compete with that of even trained radiologists \cite{workload}. Some experts even go so far as to claim that radiologists will gradually be altogether replaced by better-performing, cheaper, and faster AI systems \cite{ai_foe}, while others maintain that radiologists will continue to play the central role, and AI tools will remain just that - an additional tool to enhance their work quality \cite{doctors_ftw}. Either way, the consensus is clearly in favour of the benefits of increasing the quality and roll-out of AI models for improved diagnostic accuracy and quality, and its potential to save lives \cite{consensus}\cite{ai_adoption}. 
+Many of these human errors have the potential to be dramatically improved through the use of computer-aided diagnosis, and in particular, modern AI image recognition models, aiding radiologists to make more accurate assessments that improve patient outcomes. With lesion detection being one of the most important yet time-consuming tasks of radiologists, such a tool would be immensely useful \cite{deep_learning_survey}. As these models continue to improve, they have already seen successful applications in providing radiologists with a second opinion in real-time, acting as a ``safety net". Of particular interest is the fact that they are entirely unaffected by human errors of bias and fatigue, and as algorithms continue to improve, their perceptual abilities begin to compete with that of even trained radiologists \cite{workload}. Some experts even go so far as to claim that radiologists will gradually be altogether replaced by better-performing, cheaper, and faster AI systems \cite{ai_foe}, while others maintain that radiologists will continue to play the central role, and AI tools will remain just that - an additional tool to enhance their work quality \cite{doctors_ftw}. Either way, the consensus is clearly in favour of the benefits of increasing the quality and roll-out of AI models for improved diagnostic accuracy and quality, and its potential to save lives \cite{consensus}\cite{ai_adoption}. 
 
-Since the dawn of Convolutional Neural Networks, and the seminal cursive recognition work done by Yann LeCun and Yoshua Bengio, machine learning algorithms have taken the world by storm in their amazing application in the field of image recognition \cite{cnn_lecun_bengio}. CNNs work by applying "convolution filters", small matrices of weights, across an input image to compute feature maps, detecting things such as corners or edges. These are sent through activation functions, such as ReLU, to introduce non-linearity, and then through pooling layers to reduce the spatial dimensions and reduce the computational power necessary, while aiming to preserve the information. Finally, as with all deep learning architectures, they are fed through various layers, where artificial neurons are connected either sparsely or densely. 
+Since the dawn of Convolutional Neural Networks, and the seminal handwriting recognition work done by Yann LeCun and Yoshua Bengio, machine learning algorithms have taken the world by storm in their amazing application in the field of image recognition \cite{cnn_lecun_bengio}. CNNs work by applying "convolution filters", small matrices of weights, across an input image to compute feature maps, detecting things such as corners or edges. These are sent through activation functions, such as ReLU, to introduce non-linearity, and then through pooling layers to reduce the spatial dimensions and reduce the computational power necessary, while aiming to preserve the information. Finally, as with all deep learning architectures, they are fed through various layers, where artificial neurons are connected either sparsely or densely. 
 
-Many models have since been developed that build on this fundamental base. The YOLO (You Only Look Once) model, or subsequent versions such as YOLOv2 through YOLOv7, is a single-stage detector, and as such is very fast but sacrifices some accuracy \cite{yolo}. \hl{Explain basic function and performance of Faster R-CNN, U-NET, and other models we decide to use.}
+Many models have since been developed that build on this fundamental base. The YOLO (You Only Look Once) model, or subsequent versions such as YOLOv2 through YOLOv7, is a single-stage detector, and as such is very fast but sacrifices some accuracy \cite{yolo}. In particular, YOLOv3 is a real-time object detection algorithm, whose speed is attributed to its single forward pass through a CNN. Unlike two-stage detectors such as R-CNN it performs object localization and classification in one unified step, using a feature pyramid to handle different object sizes, grid division and anchor boxes to predict probability scores and bounding boxes, and a multi-part loss function to enhance accuracy.
 
 
 % === III. HYPOTHESIS ========================
 % =================================================================================
 \section{Hypothesis}
-Our primary aim is to explore the accuracy with which an AI model can generate bounding boxes for lesions on CT scan images, as compared to the ground truth. We hypothesize that state-of-the-art image recognition algorithms are able to perform on-par, or even exceed, expert analysis.
+Our primary aim is to apply YOLOv3 to generate bounding boxes for lesions on CT scan images, comparing performance to the ground truth. We hypothesize that it can perform on-par, or even exceed, expert analysis.
 
 % === IV. METHODS ========================
 % =================================================================================
 \section{Methods}
 \subsection{Dataset overview}
-We train our model on the DeepLesion dataset, which contains 32,735 lesions in 32,120 CT slices from 10,594 studies of 4,427 unique patients \cite{deeplesion}. This dataset is publicly available and does not require special access permissions. The data is gathered from CT scan images that were annotated by radiologists during routine analysis, and stored as ``bookmarks" in hospitals' picture archiving and communication systems (PACS).  
-
-Every image is annotated with a bounding box surrounding lesions, and each lesion contains information about the lesion diameter and lesion type.
-We will implement the various models previously discussed, comparing the advantages and drawbacks of each. \hl{This will be further addressed in the background, and should be adjusted based on the models we end up choosing}. We will determine these models' speed and accuracy trade-offs, using the Dice-Sørensen coefficient to compare our model’s performance relative to the original bounding boxes.
-
-\subsection{Splitting data and accounting for skewing}
-To ensure that the data is not skewed, we will ensure the data is split by patient into training, validation and testing. By splitting the data, we can check the performance of our model on new data that was not used for training \cite{chollet_deep_learning}. We will also attempt to address the possibility of skewed data due to all images in the dataset containing a lesion, and some lesions not being annotated \cite{deeplesion}. The proposed fix is to remove lesions for part of the data somehow, either by slicing out part of the image entirely or by using content-aware filling, such that our model will not be biased towards always predicting lesions on scans.
-
-\subsection{Data pre-processing}
-First, the images had to be read into an array using the library PIL, and then their values were converted from unsigned to signed format by subtracting 32768 \cite{deeplesion}. Next, they were scaled down as necessary so the sizes match, and saved into a pytorch tensor, followed by a pytorch dataset and dataloader. For each image, their corresponding bounding boxes also were read from the csv and processed into a grid, as input to train and test the YOLO model. As some images have multiple bounding boxes (corresponding to multiple lesions), multiple entries from the csv needed to be read to ensure all the bounding boxes for a given image are recorded.
-
-Images were loaded into a visualizer to ensure bounding boxes were processed correctly. This was also useful later for converting the grids outputted by the YOLO model to bounding boxes, visualizing them, and comparing their performances to the ground truth bounding boxes. An example is shown in Figure \ref{interpret_error}.
 
 % =======
 % FIG. 02
 % =======
 \begin{figure}
  \begin{center}
- \includegraphics[width=3.5in]{images/example_scan.png}\\
- \caption{Example visualization of a DeepLesion scan, with bounding box displayed in red}\label{example_scan}
+ \includegraphics[width=2.5in]{images/example_scan.png}\\
+ \caption{Example visualization of a DeepLesion scan, with lesion bounding box displayed in red}\label{example_scan}
  \end{center}
 \end{figure}
 
-\hl{Discuss additional data processing as necessary.}
+
+The DeepLesion dataset contains 32,735 lesions in 32,120 CT slices from 10,594 studies of 4,427 unique patients \cite{deeplesion}, which is pre-filtered to remove faulty data. We train our model on a subset developed on Kaggle \cite{kaggle}. This dataset is publicly available and does not require special access permissions. The data is gathered from CT scan images that were annotated by radiologists during routine analysis, and stored as ``bookmarks" in hospitals' picture archiving and communication systems (PACS).  
+
+Every image is annotated with a bounding box surrounding lesions, and each lesion contains information about the lesion diameter and lesion type. 
+
+\subsection{Data pre-processing and model design}
+To ensure that the data is not skewed based on the anatomic differences of individual patients, we split the records by patient into training, validation and testing \cite{chollet_deep_learning}. 
+
+We applied a version of the YOLOv3 model using the architecture developed by Redmon et al., to provide a fast diagnostic tool with minimal computational requirements to run \cite{yolov3}. This required data pre-processing to match the model's input requirements.
+
+First, the images were read into an array using the PIL library, and then their values were converted from unsigned to signed format by subtracting 32768 \cite{deeplesion}. Next, they were scaled down to 512x512, with a few additional convolution layers and a residual layer added to account for YOLOv3's requirement of 256x256 input size. Afterwards, they were saved to a Pytorch tensor, followed by a Pytorch dataset and dataloader. For each image, corresponding bounding boxes were read from the CSV file and processed into a grid, as labels to train and test the YOLO model. As some scans were annotated with multiple bounding boxes, corresponding to multiple lesions, an equal number of entries from the CSV were read to ensure all the bounding boxes for a given image were recorded.
+
+Images were loaded into a visualizer to ensure bounding boxes were processed correctly. This was also useful later for converting the grids outputted by the YOLO model to bounding boxes, visualizing them, and comparing their performances to the ground truth bounding boxes. An example is shown in Figure \ref{example_scan}. We release the pre-processing and model PyTorch Jupyter code open-source for future research.\footnote{\url{https://github.com/Aleyssu/DeepLesion-YOLOv3}}
+
+The authors of YOLOv3 mention that attempting to directly predict bounding box coordinates with a linear activation in the final layer of the model worsens model stability and performance, so we added sigmoid activation at the final layer \cite{yolov3}. As this normalized all the outputs to the range [0, 1], the labels had to be adjusted accordingly where 0 would represent the starting point and 1 the end point of all possible coordinate measurements.
+
+
+
+
 
 % === V. RESULTS ========================
 % =================================================================================
 \section{Results}
-\hl{Discuss results here once model is performing with sufficient accuracy}
+We tested our model over a variety of different epochs to balance prediction accuracy with overfitting. The accuracy and loss values are shown for several epoch values in Figure \ref{fig:compare}. As can be seen, training the model over 100 epochs led to near-zero training loss, but in testing the model refused to make predictions, as it was overfitting. At 50 epochs, the model made testing set predictions, but they were far off from the actual bounding boxes. We concluded that the model began to overfit before it was able to learn sufficient information to make predictions with high accuracy.
 
-% === VI. DISCUSSION ========================
-% =================================================================================
-\section{Discussion}
-\subsection{Implementation challenges}
-We initially attempted to build the model in tensorflow, but its lack of native GPU support for windows motivated us to migrate to pytorch. 
+% % Table 1
+% \begin{table}[ht]
+%     \centering
+%     \caption{YOLOv3 Accuracy and Loss by Number of Epochs}
+%     \label{fig:compare}
+%     \renewcommand{\arraystretch}{1} % Adjust row height
+%     \begin{tabular}{>{\raggedright\arraybackslash}p{2cm} | >{\raggedright\arraybackslash}p{1.7cm} | >{\raggedright\arraybackslash}p{1.7cm}}
+%         \textbf{Number of epochs} & \textbf{Accuracy} & \textbf{Loss} \\
+        
+%         \hline
+%         2
+%         & 0 
+%         & 0\\
 
-The first model was quickly thrown together as a placeholder to make sure the core elements of the code were working properly. It was unable to sufficiently optimize the loss and either refused to make predictions at all, resulting in very low bounding box confidences for all grids, or alternatively it predicted all grids as having bounding boxes, with relatively high confidence for all of them. These cases are shown in Figures \ref{low_boxes} and \ref{high_boxes}. A different model had to be used to produce usable results.
+%         \hline
+%         50
+%         & 0 
+%         & 0\\
+
+%         \hline
+%         100
+%         & 0 
+%         & 0\\
+
+%     \end{tabular}
+% \end{table}
+
 
 % =======
 % FIG. 03
 % =======
 \begin{figure}
  \begin{center}
+ \includegraphics[width=3.5in]{images/epochgraph.jpg}\\
+ \caption{YOLOv3 model accuracy and loss by number of training epochs \cite{radiology_error}.}\label{fig:compare}
+ \end{center}
+\end{figure}
+
+% === VI. DISCUSSION ========================
+% =================================================================================
+\section{Discussion}
+\subsection{Implementation challenges}
+Progress was greatly impeded by the high barrier to entry of Deep Learning frameworks. We initially attempted to build the model in TensorFlow, but its lack of native GPU support for Windows motivated us to migrate to Pytorch. 
+
+The first model was quickly thrown together as a placeholder to make sure the core elements of the code were working properly. It was unable to sufficiently optimize the loss and either refused to make predictions at all, resulting in very low bounding box confidences for all grids, or alternatively it predicted all grids as having bounding boxes, with relatively high confidence for all of them. These cases are shown in Figures \ref{low_boxes} and \ref{high_boxes}. At this point, we decided to apply YOLOv3 to attempt to improve the results.
+
+\subsection{Future work}
+Future research in this area should focus on applying additional models to compare performance, including some pre-trained models such as UNet \cite{unet}, as well as training on the full DeepLesion dataset to improve the performance of the current model, as we were only able to train on the Kaggle subset due to computational limitations \cite{kaggle}.
+
+Additionally, it would be beneficial to address the possibility of skewed data due to all images in the dataset containing a lesion, and some lesions not being annotated \cite{deeplesion}. A possible solution that is more accessible is to remove lesions for part of the data, either by slicing out part of the image entirely or by using content-aware filling, such that our model will not be biased towards always predicting lesions on scans. On the other hand, a more accurate solution is to employ additional expert annotation on the existing data, but given the size of the dataset, this would be extremely resource-intensive. Unsupervised learning approaches could also be considered, and compared with current findings.
+
+% =======
+% FIG. 04
+% =======
+\begin{figure}
+ \begin{center}
  \includegraphics[width=3.5in]{images/low_boxes.png}\\
- \caption{Above, the left image shows our model's output and the right shows the ground truth. With high lambda noobj for the loss function, which penalizes false positive bounding box predictions, the model makes very low-confidence decisions as seen with the barely visible red squares in the prediction image, where bounding box transparencies are scaled with confidence. None of the predictions here break the confidence threshold for making a positive prediction, so no bounding box predictions are made in this image.}\label{low_boxes}
+ \caption{Above, the left image shows the initial model's output and the right shows the ground truth. With high lambda noobj for the loss function, which penalizes false positive bounding box predictions, the initial model makes very low-confidence decisions as seen with the barely visible red squares in the prediction image, where bounding box transparencies are scaled with confidence. None of the predictions here break the confidence threshold for making a positive prediction, so no bounding box predictions are made in this image.}\label{low_boxes}
  \end{center}
 \end{figure}
 
 % =======
-% FIG. 04
+% FIG. 05
 % =======
 \begin{figure}
  \begin{center}
@@ -176,11 +223,6 @@ The first model was quickly thrown together as a placeholder to make sure the co
  \end{center}
 \end{figure}
 
-The second model we attempted was YOLOv3 \cite{yolov3}.
-
-\hl{Based on results, discuss how close we came to the ground truth in the original DeepLesion annotations. Discuss that there is bias due to the lack of images with no lesions. Discuss that there are some lesions not annotated as the radiologists were not interested in fully annotating the images, as they were not explicitly meant for training a DL model. Examples of these two extremes are shown in Figures.
-
-Discuss possible use cases, how similar models have been deployed in practice up to now, and how such models have performed.}
 
 \section*{Team Reflection}
 All three of the authors have a background in computer science and not biology. As such, our focus was on processing the data and implementing AI models with high accuracy, and not on the underlying biological significance of lesions.
