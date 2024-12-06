@@ -133,24 +133,20 @@ The DeepLesion dataset contains 32,735 lesions in 32,120 CT slices from 10,594 s
 Every image is annotated with a bounding box surrounding lesions, and each lesion contains information about the lesion diameter and lesion type. 
 
 \subsection{Data pre-processing and model design}
-To ensure that the data is not skewed based on the anatomic differences of individual patients, we split the records by patient into training, validation and testing \cite{chollet_deep_learning}. 
-
 We applied a version of the YOLOv3 model using the architecture developed by Redmon et al., to provide a fast diagnostic tool with minimal computational requirements to run \cite{yolov3}. This required data pre-processing to match the model's input requirements.
 
-First, the images were read into an array using the PIL library, and then their values were converted from unsigned to signed format by subtracting 32768 \cite{deeplesion}. Next, they were scaled down to 512x512, with a few additional convolution layers and a residual layer added to account for YOLOv3's requirement of 256x256 input size. Afterwards, they were saved to a Pytorch tensor, followed by a Pytorch dataset and dataloader. For each image, corresponding bounding boxes were read from the CSV file and processed into a grid, as labels to train and test the YOLO model. As some scans were annotated with multiple bounding boxes, corresponding to multiple lesions, an equal number of entries from the CSV were read to ensure all the bounding boxes for a given image were recorded.
+First, the images were read into an array using the PIL library, and then their values were converted from unsigned to signed format by subtracting 32768 \cite{deeplesion}. Most of the images in the dataset were 512x512 pixels in dimension, so the few that weren't were rescaled to 512x512. Afterwards, they were saved to a Pytorch tensor and split off into training, testing, and validation Pytorch dataset and dataloaders. Each image's corresponding bounding boxes were read from the CSV file and processed into a grid as labels for the model. As some scans were annotated with multiple bounding boxes corresponding to multiple lesions, multiple entries from the CSV were read in sequence to ensure all the bounding boxes for a given image were recorded.
 
-Images were loaded into a visualizer to ensure bounding boxes were processed correctly. This was also useful later for converting the grids outputted by the YOLO model to bounding boxes, visualizing them, and comparing their performances to the ground truth bounding boxes. An example is shown in Figure \ref{example_scan}. We release the pre-processing and model PyTorch Jupyter code open-source for future research.\footnote{\url{https://github.com/Aleyssu/DeepLesion-YOLOv3}}
+Images were loaded into a visualizer to ensure bounding boxes were processed correctly. This would later be useful for converting the grids outputted by the YOLO model to bounding boxes, visualizing them, and comparing their performances to the ground truth bounding boxes. An example is shown in Figure \ref{example_scan}. We release the pre-processing and model PyTorch Jupyter code open-source for future research.\footnote{\url{https://github.com/Aleyssu/DeepLesion-YOLOv3}}
 
-The authors of YOLOv3 mention that attempting to directly predict bounding box coordinates with a linear activation in the final layer of the model worsens model stability and performance, so we added sigmoid activation at the final layer \cite{yolov3}. As this normalized all the outputs to the range [0, 1], the labels had to be adjusted accordingly where 0 would represent the starting point and 1 the end point of all possible coordinate measurements.
-
-
-
+The authors of YOLOv3 mention that attempting to directly predict bounding box coordinates with a linear activation in the final layer of the model worsens model stability and performance, so we added a sigmoid activation at the final layer \cite{yolov3}. As this normalized all the outputs to the range [0, 1], the labels had to be adjusted accordingly where 0 would represent the starting point and 1 the end point of all possible coordinate measurements.
 
 
 % === V. RESULTS ========================
 % =================================================================================
 \section{Results}
-We tested our model over a variety of different epochs to balance prediction accuracy with overfitting. The accuracy and loss values are shown for several epoch values in Figure \ref{fig:compare}. As can be seen, training the model over 100 epochs led to near-zero training loss, but in testing the model refused to make predictions, as it was overfitting. At 50 epochs, the model made testing set predictions, but they were far off from the actual bounding boxes. We concluded that the model began to overfit before it was able to learn sufficient information to make predictions with high accuracy.
+We tested our model over a variety of different epochs to balance prediction accuracy with overfitting. The training and validation losses over the epochs are shown in Figure \ref{fig:compare}. As can be seen, training the model over 100 epochs led to a near-zero loss on the training set, but validation loss only went up. This is reflected on the testing set, where the model was unable to make any predictions (see Fig. \ref{fig:training} and Fig. \ref{fig:testing}). It is clear the model was being overfit and could not generalize to new images. At 50 epochs, the model made testing set predictions, but they were far off from the actual bounding boxes. We concluded that the model began to overfit before it was able to learn sufficient information to make predictions with high accuracy. It is possible that training on a larger subset or the entirety of the DeepLesion dataset would reduce overfitting and improve generalization, but time constraints and the computational limits of using a single personal computer to train the model with prevented us from attempting this.
+
 
 % % Table 1
 % \begin{table}[ht]
@@ -190,26 +186,13 @@ We tested our model over a variety of different epochs to balance prediction acc
  \end{center}
 \end{figure}
 
-% === VI. DISCUSSION ========================
-% =================================================================================
-\section{Discussion}
-\subsection{Implementation challenges}
-Progress was greatly impeded by the high barrier to entry of Deep Learning frameworks. We initially attempted to build the model in TensorFlow, but its lack of native GPU support for Windows motivated us to migrate to Pytorch. 
-
-The first model was quickly thrown together as a placeholder to make sure the core elements of the code were working properly. It was unable to sufficiently optimize the loss and either refused to make predictions at all, resulting in very low bounding box confidences for all grids, or alternatively it predicted all grids as having bounding boxes, with relatively high confidence for all of them. These cases are shown in Figures \ref{low_boxes} and \ref{high_boxes}. At this point, we decided to apply YOLOv3 to attempt to improve the results.
-
-\subsection{Future work}
-Future research in this area should focus on applying additional models to compare performance, including some pre-trained models such as UNet \cite{unet}, as well as training on the full DeepLesion dataset to improve the performance of the current model, as we were only able to train on the Kaggle subset due to computational limitations \cite{kaggle}.
-
-Additionally, it would be beneficial to address the possibility of skewed data due to all images in the dataset containing a lesion, and some lesions not being annotated \cite{deeplesion}. A possible solution that is more accessible is to remove lesions for part of the data, either by slicing out part of the image entirely or by using content-aware filling, such that our model will not be biased towards always predicting lesions on scans. On the other hand, a more accurate solution is to employ additional expert annotation on the existing data, but given the size of the dataset, this would be extremely resource-intensive. Unsupervised learning approaches could also be considered, and compared with current findings.
-
 % =======
 % FIG. 04
 % =======
 \begin{figure}
  \begin{center}
- \includegraphics[width=3.5in]{images/low_boxes.png}\\
- \caption{Above, the left image shows the initial model's output and the right shows the ground truth. With high lambda noobj for the loss function, which penalizes false positive bounding box predictions, the initial model makes very low-confidence decisions as seen with the barely visible red squares in the prediction image, where bounding box transparencies are scaled with confidence. None of the predictions here break the confidence threshold for making a positive prediction, so no bounding box predictions are made in this image.}\label{low_boxes}
+ \includegraphics[width=3.5in]{images/training performance.PNG}\\
+ \caption{Bounding box predictions for an image from the training set. The left image shows the model's output and the right shows the ground truth.}\label{fig:training}
  \end{center}
 \end{figure}
 
@@ -218,10 +201,25 @@ Additionally, it would be beneficial to address the possibility of skewed data d
 % =======
 \begin{figure}
  \begin{center}
- \includegraphics[width=3.5in]{images/high_boxes.png}\\
- \caption{With low lambda noobj, penalizing false negative predictions more, the model confidently predicts all cells as having a bounding box without regard for their coordinates.}\label{high_boxes}
+ \includegraphics[width=3.5in]{images/testing performance.png}\\
+ \caption{Bounding box predictions for an image from the testing set. The model failed to make any predictions on the new image.}\label{fig:testing}
  \end{center}
 \end{figure}
+
+% === VI. DISCUSSION ========================
+% =================================================================================
+\section{Discussion}
+\subsection{Implementation challenges}
+Progress was greatly impeded by the high barrier to entry of Deep Learning frameworks. We initially attempted to build the model in TensorFlow, but its lack of native GPU support for Windows motivated us to migrate to Pytorch. 
+
+Setting up the code framework and data preprocessing pipeline took a deceptively long time. It took so long that we nearly ran out of time to implement the YOLOv3 model, and we didn't have enough time to tinker with the model further and explore using the entire DeepLesion dataset for training. Future projects should take into account the amount of time data preprocessing will take and plan accordingly by dedicating lots of time to it.
+
+The first model was a quickly thrown together CNN as a placeholder to make sure the core elements of the code were working properly. It was unable to sufficiently optimize the loss and either refused to make predictions at all, resulting in very low bounding box confidences for all grids, or alternatively it predicted all grids as having bounding boxes, with relatively high confidence for all of them. At this point, we decided to apply YOLOv3 to attempt to improve the results.
+
+\subsection{Future work}
+Future research in this area should focus on applying additional models to compare performance, including some pre-trained models such as UNet \cite{unet}, as well as training on the full DeepLesion dataset to improve the performance of the current model, as we were only able to train on the Kaggle subset due to computational limitations \cite{kaggle}. Furthermore, To ensure that the data is not potentially skewed based on the anatomic differences of individual patients, we can split the records by patient when performing the train-test-validation split \cite{chollet_deep_learning}. 
+
+Additionally, it would be beneficial to address the possibility of skewed data due to all images in the dataset containing a lesion, and some lesions not being annotated \cite{deeplesion}. A possible solution that is more accessible is to remove lesions for part of the data, either by slicing out part of the image entirely or by using content-aware filling, such that our model will not be biased towards always predicting lesions on scans. On the other hand, a more accurate solution is to employ additional expert annotation on the existing data, but given the size of the dataset, this would be extremely resource-intensive. Unsupervised learning approaches could also be considered, and compared with current findings.
 
 
 \section*{Team Reflection}
