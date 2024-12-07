@@ -60,7 +60,9 @@ Radiologists manually evaluate large volumes of CT scans daily, and with this la
 
 Our primary aim is to improve the interpretation process by employing a state-of-the-art YOLOv3 image recognition model to give radiologists an additional tool to assist with their analysis, particularly for identifying lesions, which will improve patient diagnostic accuracy. Using the massive DeepLesion \cite{deeplesion} dataset, we train the model and determine its performance. Unfortunately, given the time constraint, we were unable to produce a model with sufficient accuracy for real-world use; additional work is required.
 
-The output of the model can be deployed for use in hospitals, and be further inspected by radiologists to determine malignancy and subsequent treatment. We argue that such a tool improves the performance of human analysis alone, mitigating human error caused by fatigue, long hours, and other challenging circumstances radiologists face. \end{abstract}
+The output of the model can be deployed for use in hospitals, and be further inspected by radiologists to determine malignancy and subsequent treatment. We argue that such a tool improves the performance of human analysis alone, mitigating human error caused by fatigue, long hours, and other challenging circumstances radiologists face. 
+
+We release the pre-processing and model PyTorch Jupyter code open-source for future research: \textit{\url{https://github.com/Aleyssu/DeepLesion-YOLOv3}} \end{abstract}
 
 \begin{IEEEkeywords}
 Radiology, DeepLesion, Convolutional Neural Network, U-Net, YOLO
@@ -137,7 +139,7 @@ We applied a version of the YOLOv3 model using the architecture developed by Red
 
 First, the images were read into an array using the PIL library, and then their values were converted from unsigned to signed format by subtracting 32768 \cite{deeplesion}. Most of the images in the dataset were 512x512 pixels in dimension, so the few that weren't were rescaled to 512x512. Afterwards, they were saved to a Pytorch tensor and split off into training, testing, and validation Pytorch dataset and dataloaders. Each image's corresponding bounding boxes were read from the CSV file and processed into a grid as labels for the model. As some scans were annotated with multiple bounding boxes corresponding to multiple lesions, multiple entries from the CSV were read in sequence to ensure all the bounding boxes for a given image were recorded.
 
-Images were loaded into a visualizer to ensure bounding boxes were processed correctly. This would later be useful for converting the grids outputted by the YOLO model to bounding boxes, visualizing them, and comparing their performances to the ground truth bounding boxes. An example is shown in Figure \ref{example_scan}. We release the pre-processing and model PyTorch Jupyter code open-source for future research.\footnote{\url{https://github.com/Aleyssu/DeepLesion-YOLOv3}}
+Images were loaded into a visualizer to ensure bounding boxes were processed correctly. This would later be useful for converting the grids outputted by the YOLO model to bounding boxes, visualizing them, and comparing their performances to the ground truth bounding boxes. An example is shown in Figure \ref{example_scan}. 
 
 The authors of YOLOv3 mention that attempting to directly predict bounding box coordinates with a linear activation in the final layer of the model worsens model stability and performance, so we added a sigmoid activation at the final layer \cite{yolov3}. As this normalized all the outputs to the range [0, 1], the labels had to be adjusted accordingly where 0 would represent the starting point and 1 the end point of all possible coordinate measurements.
 
@@ -146,34 +148,6 @@ The authors of YOLOv3 mention that attempting to directly predict bounding box c
 % =================================================================================
 \section{Results}
 We tested our model over a variety of different epochs to balance prediction accuracy with overfitting. The training and validation losses over the epochs are shown in Figure \ref{fig:compare}. As can be seen, training the model over 100 epochs led to a near-zero loss on the training set, but validation loss only went up. This is reflected on the testing set, where the model was unable to make any predictions (see Fig. \ref{fig:training} and Fig. \ref{fig:testing}). It is clear the model was being overfit and could not generalize to new images. At 50 epochs, the model made testing set predictions, but they were far off from the actual bounding boxes. We concluded that the model began to overfit before it was able to learn sufficient information to make predictions with high accuracy. It is possible that training on a larger subset or the entirety of the DeepLesion dataset would reduce overfitting and improve generalization, but time constraints and the computational limits of using a single personal computer to train the model with prevented us from attempting this.
-
-
-% % Table 1
-% \begin{table}[ht]
-%     \centering
-%     \caption{YOLOv3 Accuracy and Loss by Number of Epochs}
-%     \label{fig:compare}
-%     \renewcommand{\arraystretch}{1} % Adjust row height
-%     \begin{tabular}{>{\raggedright\arraybackslash}p{2cm} | >{\raggedright\arraybackslash}p{1.7cm} | >{\raggedright\arraybackslash}p{1.7cm}}
-%         \textbf{Number of epochs} & \textbf{Accuracy} & \textbf{Loss} \\
-        
-%         \hline
-%         2
-%         & 0 
-%         & 0\\
-
-%         \hline
-%         50
-%         & 0 
-%         & 0\\
-
-%         \hline
-%         100
-%         & 0 
-%         & 0\\
-
-%     \end{tabular}
-% \end{table}
 
 
 % =======
