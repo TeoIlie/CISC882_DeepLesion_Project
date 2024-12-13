@@ -65,7 +65,8 @@ The output of the model can be deployed for use in hospitals, and be further ins
 We release the pre-processing and model PyTorch Jupyter code open-source for future research: \textit{\url{https://github.com/Aleyssu/DeepLesion-YOLOv3}} \end{abstract}
 
 \begin{IEEEkeywords}
-Radiology, DeepLesion, Convolutional Neural Network, U-Net, YOLO
+Radiology, DeepLesion, Convolutional Neural Network, EncoderNet, YOLO
+
 \end{IEEEkeywords}
 
 
@@ -190,8 +191,21 @@ Setting up the code framework and data preprocessing pipeline took a deceptively
 
 The first model was a quickly thrown together CNN as a placeholder to make sure the core elements of the code were working properly. It was unable to sufficiently optimize the loss and either refused to make predictions at all, resulting in very low bounding box confidences for all grids, or alternatively it predicted all grids as having bounding boxes, with relatively high confidence for all of them. At this point, we decided to apply YOLOv3 to attempt to improve the results.
 
+\subsection{Comaparison with EncoderNet}
+As the YOLO model was not performing satisfactorily, we attempted another model. For this, we selected EncoderNet and trained it on the DeepLesion dataset as well \cite{Tamhane_Saxena_Huang}, with some example outputs shown in \ref{fig:encoder}. This implementation used the correct data split according to the DeepLesion documentation \cite{deeplesion}. In addition, EncoderNet contains several modules that are not present in YOLO, such as the occlusion-removal autoencoder, bottom-up path augmentation, feature pooling, box regression, and deep feature unsupervised clustering using the pre-trained vgg16 model. The architecture of EncoderNet is also simpler than that of the YOLO model. The performance of EncoderNet appears promising, but further work is required to determine how it compares with YOLO. A takeaway is that a better occlusion encoder in the YOLO model for image pre-processing may improve its current performance.
+
+% =======
+% FIG. 06
+% =======
+\begin{figure}
+ \begin{center}
+ \includegraphics[width=3.5in]{images/encoder.png}\\
+ \caption{Two EncoderNet example predictions. Bounding box predictions are indicated with red, and the correct bounding box is indicated with green.}\label{fig:encoder}
+ \end{center}
+\end{figure}
+
 \subsection{Future work}
-Future research in this area should focus on applying additional models to compare performance, including some pre-trained models such as UNet \cite{unet}, as well as training on the full DeepLesion dataset to improve the performance of the current model, as we were only able to train on the Kaggle subset due to computational limitations \cite{kaggle}. Furthermore, To ensure that the data is not potentially skewed based on the anatomic differences of individual patients, we can split the records by patient when performing the train-test-validation split \cite{chollet_deep_learning}. 
+Future research in this area should focus on applying additional models to compare performance, including some pre-trained models such as UNet \cite{unet}, as well as training on the full DeepLesion dataset to improve the performance of the current model, as we were only able to train on the Kaggle subset due to computational limitations \cite{kaggle}. Furthermore, to ensure that data are not potentially biased based on the anatomic differences of individual patients, we can split the records by patient when performing the train-test-validation split \cite{chollet_deep_learning}. 
 
 Additionally, it would be beneficial to address the possibility of skewed data due to all images in the dataset containing a lesion, and some lesions not being annotated \cite{deeplesion}. A possible solution that is more accessible is to remove lesions for part of the data, either by slicing out part of the image entirely or by using content-aware filling, such that our model will not be biased towards always predicting lesions on scans. On the other hand, a more accurate solution is to employ additional expert annotation on the existing data, but given the size of the dataset, this would be extremely resource-intensive. Unsupervised learning approaches could also be considered, and compared with current findings.
 
